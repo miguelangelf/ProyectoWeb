@@ -6,9 +6,15 @@
         <link rel="stylesheet" href="../css/bootstrap.css" />
         <script src="../js/jquery-1.11.3.js"></script>
         <script src="../js/bootstrap.js"></script>
+        <script src="../js/myscript.js"></script>
         <title>JSP Page</title>
     </head>
     <body>
-        <%@include file="ListMovies.jsp" %>
+        <div class="container">
+            <h1>Tus peliculas</h1>
+            <div id="lista">
+                Cargando...
+            </div>
+        </div>
     </body>
 </html>

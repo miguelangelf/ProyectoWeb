@@ -20,17 +20,21 @@ public class Consulta extends Conexion {
     public ArrayList<BeanMovie> GetAllMovies() throws SQLException {
         Statement st = con.createStatement();
         ResultSet rs = null;
-        String consulta = "Select * from movies";
+        String consulta = "select * from pelicula";
         BeanMovie bm;
         ArrayList <BeanMovie> lista=new ArrayList();
         
         rs = st.executeQuery(consulta);
         while (rs.next()) {
             bm=new BeanMovie();
-            String nombre = rs.getString("name");
-            int anio=rs.getInt("anio");
+            
+            int id=rs.getInt("id");
+            String nombre = rs.getString("nombre");
+            String otro=rs.getString("otro");
+            
+            bm.id=id;
             bm.nombre=nombre;
-            bm.anio=anio;
+            bm.otro=otro;
             lista.add(bm);           
 
         }
@@ -41,6 +45,9 @@ public class Consulta extends Conexion {
         {
             //Solo para probar la clase.
             Consulta cc = new Consulta();
+            ArrayList<BeanMovie> mispelis= cc.GetAllMovies();
+            System.out.println(mispelis.size());
+            
         }
     }
 }
