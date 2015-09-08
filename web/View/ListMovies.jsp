@@ -9,18 +9,35 @@
         </tr>
     </thead>
     <tbody>
-        
-         <c:forEach items="${movies}" var="movie">
-                <tr>
-                    
-                    <td><c:out value="${movie.id}" /></td>
-                    <td><c:out value="${movie.nombre}" /></td>
-                    <td><c:out value="${movie.otro}" /></td>
-                </tr>
-            </c:forEach>
+
+        <c:forEach items="${movies}" var="movie">
+            <tr class="elemento" id="<c:out value="${movie.id}" />">
+
+                <td><c:out value="${movie.id}" /></td>
+                <td><c:out value="${movie.nombre}" /></td>
+                <td><c:out value="${movie.otro}" /></td>
+            </tr>
+        </c:forEach>
 
 
 
 
     </tbody>
 </table>
+
+<script>
+    $('.elemento').on('click', function () {
+        var id = $(this).attr("id");
+        $('#myModal').modal();
+
+
+        $.post("/ProyectoWeb/MovieController", {option: "select",movid: id}, function (data, status) {
+            //alert(data);
+            var obj = JSON.parse(data);
+            $("#mid").html(obj.id);
+            $("#mnombre").html(obj.nombre);
+            $("#motro").html(obj.otro);
+        });
+
+    });
+</script>

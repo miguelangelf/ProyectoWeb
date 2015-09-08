@@ -22,32 +22,53 @@ public class Consulta extends Conexion {
         ResultSet rs = null;
         String consulta = "select * from pelicula";
         BeanMovie bm;
-        ArrayList <BeanMovie> lista=new ArrayList();
-        
+        ArrayList<BeanMovie> lista = new ArrayList();
+
         rs = st.executeQuery(consulta);
         while (rs.next()) {
-            bm=new BeanMovie();
-            
-            int id=rs.getInt("id");
+            bm = new BeanMovie();
+
+            int id = rs.getInt("id");
             String nombre = rs.getString("nombre");
-            String otro=rs.getString("otro");
-            
-            bm.id=id;
-            bm.nombre=nombre;
-            bm.otro=otro;
-            lista.add(bm);           
+            String otro = rs.getString("otro");
+
+            bm.id = id;
+            bm.nombre = nombre;
+            bm.otro = otro;
+            lista.add(bm);
 
         }
         return lista;
+    }
+
+    public BeanMovie getMovieSpech(int theid) throws SQLException {
+        Statement st = con.createStatement();
+        ResultSet rs = null;
+        String consulta = "select * from pelicula where id="+theid;
+        BeanMovie bm=new BeanMovie();
+
+        rs = st.executeQuery(consulta);
+        rs.next();
+
+        int id = rs.getInt("id");
+        String nombre = rs.getString("nombre");
+        String otro = rs.getString("otro");
+
+        bm.id = id;
+        bm.nombre = nombre;
+        bm.otro = otro;
+
+        return bm;
+
     }
 
     public static void main(String[] args) throws SQLException {
         {
             //Solo para probar la clase.
             Consulta cc = new Consulta();
-            ArrayList<BeanMovie> mispelis= cc.GetAllMovies();
+            ArrayList<BeanMovie> mispelis = cc.GetAllMovies();
             System.out.println(mispelis.size());
-            
+
         }
     }
 }

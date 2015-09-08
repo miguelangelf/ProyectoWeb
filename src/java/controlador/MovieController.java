@@ -12,6 +12,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -39,21 +41,37 @@ public class MovieController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
-        String option=request.getParameter("option");
-        String forward="";
-        
-        
-        if(option.equals("getall"))
-        {
-            forward="View/ListMovies.jsp";
-            Consulta con=new Consulta();
-            ArrayList <BeanMovie> pelis=con.GetAllMovies();
-            request.setAttribute("movies", pelis);    
-            
+        String option = request.getParameter("option");
+        String movid = request.getParameter("movid");
+        String forward = "";
+
+        if (option.equals("getall")) {
+            forward = "View/ListMovies.jsp";
+            Consulta con = new Consulta();
+            ArrayList<BeanMovie> pelis = con.GetAllMovies();
+            request.setAttribute("movies", pelis);
+            RequestDispatcher view = request.getRequestDispatcher(forward);
+            view.forward(request, response);
+
         }
-        
-        RequestDispatcher view = request.getRequestDispatcher(forward);
-        view.forward(request, response);
+
+        if (option.equals("select")) {
+            int id = Integer.parseInt(movid);
+            Consulta con = new Consulta();
+            BeanMovie actual = con.getMovieSpech(id);
+
+            JsonObject jo = Json.createObjectBuilder()
+                    .add("id", actual.id)
+                    .add("nombre", actual.nombre)
+                    .add("otro", actual.otro)
+                    .build();
+
+           PrintWriter out = response.getWriter();
+            out.print(jo.toString());
+            out.flush();
+
+        }
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

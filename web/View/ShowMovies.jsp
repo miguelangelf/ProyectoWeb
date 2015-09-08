@@ -10,6 +10,7 @@
         <title>JSP Page</title>
     </head>
     <body>
+        <%@include file="moreinfo.jsp" %>
         <div class="container">
             <h1>Tus peliculas</h1>
             <div id="lista">
