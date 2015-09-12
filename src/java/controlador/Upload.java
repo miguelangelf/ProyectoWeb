@@ -7,28 +7,29 @@ package controlador;
 
 import Movie.Beans.BeanMovie;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.servlet.RequestDispatcher;
-
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 import modelo.Consulta;
 
 /**
  *
  * @author miguel
  */
-@WebServlet(name = "MovieController", urlPatterns = {"/MovieController"})
-public class MovieController extends HttpServlet {
+@WebServlet(name = "Upload", urlPatterns = {"/Upload"})
+@MultipartConfig(location = "/tmp", fileSizeThreshold = 1024 * 1024,
+        maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 5 * 5)
+public class Upload extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -42,58 +43,58 @@ public class MovieController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
-        String option = request.getParameter("option");
-        String movid = request.getParameter("movid");
-        String forward = "";
-
-        if (option.equals("getall")) {
-            forward = "View/ListMovies.jsp";
-            Consulta con = new Consulta();
-            ArrayList<BeanMovie> movies = con.GetAllMovies();
-            request.setAttribute("movies", movies);
-            RequestDispatcher view = request.getRequestDispatcher(forward);
-            view.forward(request, response);
-
+        
+        String nombre = request.getParameter("nombre");
+        String anio = request.getParameter("anio");
+        String clasificacion = request.getParameter("clasificacion");
+        String director = request.getParameter("director");
+        String duracion = request.getParameter("duracion");
+        InputStream inputStream = null;
+        String actores=request.getParameter("actores");
+        String generos=request.getParameter("generos");
+        Part filePart = request.getPart("imagen");
+        
+        if (filePart != null) {
+            inputStream = filePart.getInputStream();
+        } else {
+            return;
         }
-
-        if (option.equals("select")) {
-            int id = Integer.parseInt(movid);
-            Consulta con = new Consulta();
-            BeanMovie actual = con.getMovieSpech(id);
-            String actores = "";
-            String generos = "";
-
-            for (int i = 0; i < actual.actores.size(); i++) {
-                actores += actual.actores.get(i);
-                if (i < actual.actores.size() - 1) {
-                    actores += ", ";
-                }
-            }
-
-            for (int i = 0; i < actual.genero.size(); i++) {
-                generos += actual.genero.get(i);
-                if (i < actual.genero.size() - 1) {
-                    generos += ", ";
-                }
-            }
-
-            JsonObject jo = Json.createObjectBuilder()
-                    .add("id", actual.id)
-                    .add("nombre", actual.nombre)
-                    .add("anio", actual.anio)
-                    .add("clasificacion", actual.clasificacion)
-                    .add("duracion", actual.duracion)
-                    .add("director", actual.director)
-                    .add("generos", generos)
-                    .add("actores", actores)
-                    .build();
-
-            PrintWriter out = response.getWriter();
-            out.print(jo.toString());
-            out.flush();
-
-        }
-
+        BeanMovie movie = new BeanMovie();
+        movie.setNombre(nombre);
+        movie.setAnio(Integer.parseInt(anio));
+        movie.setClasificacion(clasificacion);
+        movie.setDirector(director);
+        movie.setDuracion(Integer.parseInt(duracion));
+        movie.setImage(inputStream);
+        movie=Dummy(movie);
+        
+        Consulta con = new Consulta();
+        con.Insert(movie);
+        
+        
+    }
+    
+    public  BeanMovie Dummy(BeanMovie bm)
+    {
+        ArrayList <String> generos=new ArrayList();
+         generos.add("Genero dummy 1");         
+         generos.add("Genero dummy 2");
+         generos.add("Genero dummy 3");
+         generos.add("Genero dummy 4");
+         
+         ArrayList <String> actores=new ArrayList();
+         actores.add("Actor dummy 1");         
+         actores.add("Actor dummy 2");
+         actores.add("Actor dummy 3");
+         actores.add("Actor dummy 4");
+         
+         bm.setActores(actores);
+         bm.setGenero(generos);
+         
+         return bm;
+         
+         
+    
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -111,7 +112,7 @@ public class MovieController extends HttpServlet {
         try {
             processRequest(request, response);
         } catch (SQLException ex) {
-            Logger.getLogger(MovieController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Upload.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -129,7 +130,7 @@ public class MovieController extends HttpServlet {
         try {
             processRequest(request, response);
         } catch (SQLException ex) {
-            Logger.getLogger(MovieController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Upload.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

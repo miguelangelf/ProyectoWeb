@@ -1,0 +1,47 @@
+
+.pushright{
+    float: right;
+}
+
+
+.pushleft{
+    float: left;
+}
+
+.verticalspace{
+    width: 100%;
+    height: 2em;
+
+}
+
+.showborder{
+    border: 20px;
+
+}
+
+.valign {
+    vertical-align: middle;
+} 
+
+img.mini {
+    display: block;
+    max-width:180px;
+    max-height:200px;
+    width: auto;
+    height: auto;
+}
+
+img.big {
+    display: block;
+    max-width:270px;
+    max-height:400px;
+    width: auto;
+    height: auto;
+}
+
+
+
+.elementheight{
+    height: 250px; 
+
+}

@@ -5,30 +5,27 @@
  */
 package controlador;
 
-import Movie.Beans.BeanMovie;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.sql.Blob;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.servlet.RequestDispatcher;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import modelo.Conexion;
 import modelo.Consulta;
 
 /**
  *
  * @author miguel
  */
-@WebServlet(name = "MovieController", urlPatterns = {"/MovieController"})
-public class MovieController extends HttpServlet {
+@WebServlet(name = "LoadImage", urlPatterns = {"/LoadImage"})
+public class LoadImage extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -42,57 +39,16 @@ public class MovieController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
-        String option = request.getParameter("option");
+
         String movid = request.getParameter("movid");
-        String forward = "";
-
-        if (option.equals("getall")) {
-            forward = "View/ListMovies.jsp";
-            Consulta con = new Consulta();
-            ArrayList<BeanMovie> movies = con.GetAllMovies();
-            request.setAttribute("movies", movies);
-            RequestDispatcher view = request.getRequestDispatcher(forward);
-            view.forward(request, response);
-
-        }
-
-        if (option.equals("select")) {
-            int id = Integer.parseInt(movid);
-            Consulta con = new Consulta();
-            BeanMovie actual = con.getMovieSpech(id);
-            String actores = "";
-            String generos = "";
-
-            for (int i = 0; i < actual.actores.size(); i++) {
-                actores += actual.actores.get(i);
-                if (i < actual.actores.size() - 1) {
-                    actores += ", ";
-                }
-            }
-
-            for (int i = 0; i < actual.genero.size(); i++) {
-                generos += actual.genero.get(i);
-                if (i < actual.genero.size() - 1) {
-                    generos += ", ";
-                }
-            }
-
-            JsonObject jo = Json.createObjectBuilder()
-                    .add("id", actual.id)
-                    .add("nombre", actual.nombre)
-                    .add("anio", actual.anio)
-                    .add("clasificacion", actual.clasificacion)
-                    .add("duracion", actual.duracion)
-                    .add("director", actual.director)
-                    .add("generos", generos)
-                    .add("actores", actores)
-                    .build();
-
-            PrintWriter out = response.getWriter();
-            out.print(jo.toString());
-            out.flush();
-
-        }
+        Consulta co = new Consulta();
+        Blob bl = co.DisplayImage(Integer.parseInt(movid));
+        byte[] pict = bl.getBytes(1, (int) bl.length());
+        response.setContentType("image/jpg");
+        OutputStream o = response.getOutputStream();
+        o.write(pict);
+        o.flush();
+        o.close();
 
     }
 
@@ -111,7 +67,7 @@ public class MovieController extends HttpServlet {
         try {
             processRequest(request, response);
         } catch (SQLException ex) {
-            Logger.getLogger(MovieController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoadImage.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -129,7 +85,7 @@ public class MovieController extends HttpServlet {
         try {
             processRequest(request, response);
         } catch (SQLException ex) {
-            Logger.getLogger(MovieController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoadImage.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
